@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RationNet — Beneficiary Registry</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+  <div id="toast-container"></div>
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <!-- Confirm Modal -->
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal-box">
+      <span class="modal-icon">⚠️</span>
+      <div class="modal-title">Confirm Action</div>
+      <div class="modal-message"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+        <button class="btn btn-danger" id="modal-confirm-btn">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-layout">
+    <nav class="app-navbar">
+      <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+      <div class="navbar-brand"><span class="brand-dot"></span>RationNet</div>
+      <div class="navbar-center">
+        <div class="navbar-shop-info">
+          <span class="navbar-shop-name" id="navbar-shop-name">—</span>
+          <span class="navbar-shop-id" id="navbar-shop-id">—</span>
+        </div>
+      </div>
+    </nav>
+
+    <div class="app-body">
+      <aside class="app-sidebar" id="app-sidebar">
+        <nav class="sidebar-nav">
+          <span class="sidebar-section-label">Navigation</span>
+          <a href="dashboard.html" class="sidebar-link"><span class="nav-icon">🏠</span><span class="nav-label">Dashboard</span></a>
+          <a href="stock.html" class="sidebar-link"><span class="nav-icon">📦</span><span class="nav-label">Stock</span></a>
+          <a href="beneficiaries.html" class="sidebar-link active"><span class="nav-icon">👥</span><span class="nav-label">Beneficiaries</span></a>
+          <a href="distribution.html" class="sidebar-link"><span class="nav-icon">🚚</span><span class="nav-label">Distribution</span></a>
+          <a href="reports.html" class="sidebar-link"><span class="nav-icon">📊</span><span class="nav-label">Reports</span></a>
+        </nav>
+        <div class="sidebar-footer">RationNet © 2025<br>Maharashtra PDS</div>
+      </aside>
+
+      <main class="main-content">
+        <div class="page-header">
+          <h1 class="page-title">Beneficiary Registry</h1>
+        </div>
+
+        <!-- Add / Edit Form -->
+        <div class="form-section">
+          <div class="form-section-title">Register New Beneficiary</div>
+          <form id="ben-form" novalidate>
+            <input type="hidden" id="ben-edit-id" value="">
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="ben-name">Full Name <span class="required">*</span></label>
+                <input type="text" id="ben-name" class="form-control" placeholder="e.g. Ramesh Kumar" maxlength="60">
+                <span class="field-error" id="err-ben-name"></span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="ben-card">Ration Card No. <span class="required">*</span></label>
+                <input type="text" id="ben-card" class="form-control" placeholder="MH-XXXXXX" maxlength="9" style="text-transform:uppercase">
+                <span class="field-error" id="err-ben-card"></span>
+                <span class="field-hint">Format: MH-100001</span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="ben-category">Category <span class="required">*</span></label>
+                <select id="ben-category" class="form-control">
+                  <option value="">Select…</option>
+                  <option value="APL">APL — Above Poverty Line</option>
+                  <option value="BPL">BPL — Below Poverty Line</option>
+                  <option value="AAY">AAY — Antyodaya Anna Yojana</option>
+                </select>
+                <span class="field-error" id="err-ben-category"></span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="ben-phone">Phone <span class="required">*</span></label>
+                <input type="tel" id="ben-phone" class="form-control" placeholder="10-digit mobile" maxlength="10">
+                <span class="field-error" id="err-ben-phone"></span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="ben-members">No. of Members <span class="required">*</span></label>
+                <input type="number" id="ben-members" class="form-control" min="1" max="10" placeholder="1–10">
+                <span class="field-error" id="err-ben-members"></span>
+              </div>
+
+              <div class="form-group col-full">
+                <label class="form-label" for="ben-address">Address <span class="required">*</span></label>
+                <textarea id="ben-address" class="form-control" placeholder="Full residential address" rows="2"></textarea>
+                <span class="field-error" id="err-ben-address"></span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">
+                <span id="form-submit-label">+ Add Beneficiary</span>
+              </button>
+              <button type="button" class="btn btn-secondary" id="form-cancel-edit" style="display:none">✕ Cancel Edit</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Beneficiary Table -->
+        <div class="table-container">
+          <div class="table-toolbar">
+            <span class="table-toolbar-title">📋 Registered Beneficiaries</span>
+            <div style="display:flex;gap:12px;align-items:center">
+              <span class="table-count" id="ben-count"></span>
+              <div class="search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="ben-search" class="search-input" placeholder="Search by name or card…">
+              </div>
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Card No.</th>
+                  <th>Category</th>
+                  <th>Members</th>
+                  <th>Phone</th>
+                  <th class="no-print">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="ben-tbody">
+                <tr><td colspan="7" class="empty-state"><span class="empty-icon">⏳</span>Loading registry…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/storage.js?v=2"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/beneficiaries.js"></script>
+</body>
+</html>

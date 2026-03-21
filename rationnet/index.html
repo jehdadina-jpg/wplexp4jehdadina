@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RationNet — Login | Maharashtra PDS Portal</title>
+  <meta name="description" content="RationNet - Government of Maharashtra Public Distribution System Operator Portal">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+  <div id="toast-container"></div>
+
+  <main class="login-page">
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="brand-name">RationNet</span>
+        <span class="brand-sub">Public Distribution System Portal</span>
+      </div>
+
+      <p class="login-form-title">🔐 Operator Authentication</p>
+
+      <form class="login-form" id="login-form" novalidate autocomplete="off">
+        <input type="hidden" id="ben-edit-id" value="">
+
+        <div class="form-group">
+          <label class="form-label" for="shopId">Shop ID <span class="required">*</span></label>
+          <input
+            type="text"
+            id="shopId"
+            class="form-control"
+            placeholder="e.g. SHOP01"
+            maxlength="10"
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <span class="field-error" id="err-shopId"></span>
+          <span class="field-hint">6–10 alphanumeric characters</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password <span class="required">*</span></label>
+          <input
+            type="password"
+            id="password"
+            class="form-control"
+            placeholder="Enter operator password"
+            autocomplete="off"
+          >
+          <span class="field-error" id="err-password"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="district">District <span class="required">*</span></label>
+          <select id="district" class="form-control">
+            <option value="">— Select District —</option>
+            <option>Ahmednagar</option>
+            <option>Akola</option>
+            <option>Amravati</option>
+            <option>Aurangabad</option>
+            <option>Beed</option>
+            <option>Bhandara</option>
+            <option>Buldhana</option>
+            <option>Chandrapur</option>
+            <option>Dhule</option>
+            <option>Gadchiroli</option>
+            <option>Gondia</option>
+            <option>Hingoli</option>
+            <option>Jalgaon</option>
+            <option>Jalna</option>
+            <option>Kolhapur</option>
+            <option>Latur</option>
+            <option>Mumbai City</option>
+            <option>Mumbai Suburban</option>
+            <option>Nagpur</option>
+            <option>Nanded</option>
+            <option>Nandurbar</option>
+            <option>Nashik</option>
+            <option>Osmanabad</option>
+            <option>Palghar</option>
+            <option>Parbhani</option>
+            <option>Pune</option>
+            <option>Raigad</option>
+            <option>Ratnagiri</option>
+            <option>Sangli</option>
+            <option>Satara</option>
+            <option>Sindhudurg</option>
+            <option>Solapur</option>
+            <option>Thane</option>
+            <option>Wardha</option>
+            <option>Washim</option>
+            <option>Yavatmal</option>
+          </select>
+          <span class="field-error" id="err-district"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-login" id="btn-login">
+          <span id="btn-login-text">→ Login to Portal</span>
+        </button>
+      </form>
+
+      <div class="login-footer-text">
+        Government of Maharashtra — PDS Portal v2.0<br>
+        <span style="opacity:0.5;font-size:0.65rem">Demo: Shop ID: SHOP01 | Password: ration@2025</span>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

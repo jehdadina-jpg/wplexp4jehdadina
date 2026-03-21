@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RationNet — Distribution Reports</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+  <div id="toast-container"></div>
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <!-- Confirm Modal -->
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal-box">
+      <span class="modal-icon">⚠️</span>
+      <div class="modal-title">Confirm Action</div>
+      <div class="modal-message"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+        <button class="btn btn-primary" id="modal-confirm-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-layout">
+    <nav class="app-navbar">
+      <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+      <div class="navbar-brand"><span class="brand-dot"></span>RationNet</div>
+      <div class="navbar-center">
+        <div class="navbar-shop-info">
+          <span class="navbar-shop-name" id="navbar-shop-name">—</span>
+          <span class="navbar-shop-id" id="navbar-shop-id">—</span>
+        </div>
+      </div>
+    </nav>
+
+    <div class="app-body">
+      <aside class="app-sidebar" id="app-sidebar">
+        <nav class="sidebar-nav">
+          <span class="sidebar-section-label">Navigation</span>
+          <a href="dashboard.html" class="sidebar-link"><span class="nav-icon">🏠</span><span class="nav-label">Dashboard</span></a>
+          <a href="stock.html" class="sidebar-link"><span class="nav-icon">📦</span><span class="nav-label">Stock</span></a>
+          <a href="beneficiaries.html" class="sidebar-link"><span class="nav-icon">👥</span><span class="nav-label">Beneficiaries</span></a>
+          <a href="distribution.html" class="sidebar-link"><span class="nav-icon">🚚</span><span class="nav-label">Distribution</span></a>
+          <a href="reports.html" class="sidebar-link active"><span class="nav-icon">📊</span><span class="nav-label">Reports</span></a>
+        </nav>
+        <div class="sidebar-footer">RationNet © 2025<br>Maharashtra PDS</div>
+      </aside>
+
+      <main class="main-content">
+        <div class="page-header">
+          <h1 class="page-title">Distribution Reports</h1>
+          <div class="no-print" style="display:flex;gap:8px">
+            <button class="btn btn-secondary btn-sm" id="btn-print">🖨️ Print</button>
+            <button class="btn btn-amber btn-sm" id="btn-export-csv">⬇️ Export CSV</button>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar no-print">
+          <div class="form-group">
+            <label class="form-label" for="filter-from">From Date</label>
+            <input type="date" id="filter-from" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="filter-to">To Date</label>
+            <input type="date" id="filter-to" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="filter-item">Item</label>
+            <select id="filter-item" class="form-control">
+              <option value="All">All Items</option>
+              <option>Rice</option>
+              <option>Wheat</option>
+              <option>Sugar</option>
+              <option>Kerosene</option>
+              <option>Dal</option>
+              <option>Oil</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="filter-cat">Category</label>
+            <select id="filter-cat" class="form-control">
+              <option value="All">All Categories</option>
+              <option value="APL">APL</option>
+              <option value="BPL">BPL</option>
+              <option value="AAY">AAY</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:0;align-self:flex-end">
+            <button class="btn btn-primary" id="btn-generate">⚡ Generate</button>
+          </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="kpi-grid" style="margin-bottom:20px">
+          <div class="kpi-card">
+            <div class="kpi-icon">📋</div>
+            <div class="kpi-data">
+              <div class="kpi-value" id="sum-total-dist" style="font-size:1.5rem">—</div>
+              <div class="kpi-label">Total Distributions</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">⚖️</div>
+            <div class="kpi-data">
+              <div class="kpi-value" id="sum-total-qty" style="font-size:1.3rem">—</div>
+              <div class="kpi-label">Total Quantity</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">🏆</div>
+            <div class="kpi-data">
+              <div class="kpi-value" id="sum-top-item" style="font-size:1rem">—</div>
+              <div class="kpi-label">Most Distributed Item</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">👥</div>
+            <div class="kpi-data">
+              <div class="kpi-value" id="sum-active-ben" style="font-size:1.5rem">—</div>
+              <div class="kpi-label">Active Beneficiaries</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Report Table -->
+        <div class="table-container">
+          <div class="table-toolbar">
+            <span class="table-toolbar-title">📊 Report Results</span>
+            <span class="table-count" id="report-count"></span>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Beneficiary Name</th>
+                  <th>Card No.</th>
+                  <th>Category</th>
+                  <th>Items</th>
+                  <th>Total Qty</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="report-tbody">
+                <tr><td colspan="7" class="empty-state"><span class="empty-icon">📊</span>Click "Generate" to load report.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Print header (only visible on print) -->
+        <div style="display:none" class="print-only" id="print-header">
+          <h2 style="font-family:serif;margin-bottom:4px">RationNet — Distribution Report</h2>
+          <p style="font-size:12px;color:#555">Government of Maharashtra, Public Distribution System</p>
+          <hr style="margin:8px 0">
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <style>
+    @media print {
+      .print-only { display: block !important; }
+    }
+  </style>
+
+  <script src="js/storage.js?v=2"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/reports.js"></script>
+</body>
+</html>

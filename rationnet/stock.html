@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RationNet — Stock Management</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+  <div id="toast-container"></div>
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <!-- Confirm Modal -->
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal-box">
+      <span class="modal-icon">⚠️</span>
+      <div class="modal-title">Confirm Action</div>
+      <div class="modal-message"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+        <button class="btn btn-danger" id="modal-confirm-btn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Stock Modal -->
+  <div class="modal-overlay" id="edit-stock-modal">
+    <div class="modal-box">
+      <span class="modal-icon">✏️</span>
+      <div class="modal-title">Edit Stock Entry</div>
+      <div class="modal-message" id="edit-stock-name" style="color:var(--accent);font-family:var(--font-body);margin-bottom:16px"></div>
+      <input type="hidden" id="edit-stock-id">
+      <div class="form-group" style="margin-bottom:12px">
+        <label class="form-label">Total Stock</label>
+        <input type="number" id="edit-stock-total" class="form-control" min="0" step="0.1">
+      </div>
+      <div class="form-group" style="margin-bottom:20px">
+        <label class="form-label">Distributed</label>
+        <input type="number" id="edit-stock-distributed" class="form-control" min="0" step="0.1">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="edit-stock-cancel">Cancel</button>
+        <button class="btn btn-primary" id="edit-stock-save">💾 Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-layout">
+    <nav class="app-navbar">
+      <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+      <div class="navbar-brand"><span class="brand-dot"></span>RationNet</div>
+      <div class="navbar-center">
+        <div class="navbar-shop-info">
+          <span class="navbar-shop-name" id="navbar-shop-name">—</span>
+          <span class="navbar-shop-id" id="navbar-shop-id">—</span>
+        </div>
+      </div>
+    </nav>
+
+    <div class="app-body">
+      <aside class="app-sidebar" id="app-sidebar">
+        <nav class="sidebar-nav">
+          <span class="sidebar-section-label">Navigation</span>
+          <a href="dashboard.html" class="sidebar-link"><span class="nav-icon">🏠</span><span class="nav-label">Dashboard</span></a>
+          <a href="stock.html" class="sidebar-link active"><span class="nav-icon">📦</span><span class="nav-label">Stock</span></a>
+          <a href="beneficiaries.html" class="sidebar-link"><span class="nav-icon">👥</span><span class="nav-label">Beneficiaries</span></a>
+          <a href="distribution.html" class="sidebar-link"><span class="nav-icon">🚚</span><span class="nav-label">Distribution</span></a>
+          <a href="reports.html" class="sidebar-link"><span class="nav-icon">📊</span><span class="nav-label">Reports</span></a>
+        </nav>
+        <div class="sidebar-footer">RationNet © 2025<br>Maharashtra PDS</div>
+      </aside>
+
+      <main class="main-content">
+        <div class="page-header">
+          <h1 class="page-title">Stock Inventory</h1>
+        </div>
+
+        <!-- Add Stock Form -->
+        <div class="form-section">
+          <div class="form-section-title">Add Stock Arrival</div>
+          <form id="stock-form" novalidate>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="stock-item">Item Name <span class="required">*</span></label>
+                <select id="stock-item" class="form-control">
+                  <option value="">Select item…</option>
+                  <option>Rice</option>
+                  <option>Wheat</option>
+                  <option>Sugar</option>
+                  <option>Kerosene</option>
+                  <option>Dal</option>
+                  <option>Oil</option>
+                </select>
+                <span class="field-error" id="err-stock-item"></span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="stock-qty">Quantity <span class="required">*</span></label>
+                <input type="number" id="stock-qty" class="form-control" min="1" max="10000" step="0.1" placeholder="0.0">
+                <span class="field-error" id="err-stock-qty"></span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="stock-unit">Unit <span class="required">*</span></label>
+                <select id="stock-unit" class="form-control">
+                  <option value="">Select unit…</option>
+                  <option value="kg">kg</option>
+                  <option value="litres">litres</option>
+                </select>
+                <span class="field-error" id="err-stock-unit"></span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="stock-date">Date of Arrival <span class="required">*</span></label>
+                <input type="date" id="stock-date" class="form-control">
+                <span class="field-error" id="err-stock-date"></span>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">📥 Add to Stock</button>
+              <button type="reset" class="btn btn-secondary">↺ Reset</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Stock Table -->
+        <div class="table-container">
+          <div class="table-toolbar">
+            <span class="table-toolbar-title">📦 Current Inventory</span>
+            <div style="display:flex;gap:12px;align-items:center">
+              <span class="table-count" id="stock-count"></span>
+              <div class="search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="stock-search" class="search-input" placeholder="Filter by item…">
+              </div>
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Unit</th>
+                  <th>Total Stock</th>
+                  <th>Distributed</th>
+                  <th>Available</th>
+                  <th>Status</th>
+                  <th class="no-print">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="stock-tbody">
+                <tr><td colspan="7" class="empty-state"><span class="empty-icon">⏳</span>Loading inventory…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/storage.js?v=2"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/stock.js"></script>
+  <script>
+    // Set max date on arrival input
+    document.addEventListener('DOMContentLoaded', () => {
+      const dateEl = document.getElementById('stock-date');
+      if (dateEl) dateEl.max = new Date().toISOString().split('T')[0];
+    });
+  </script>
+</body>
+</html>

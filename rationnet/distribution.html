@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RationNet — Distribution Entry</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+  <div id="toast-container"></div>
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <!-- Confirm Modal (unused here but required by auth.js) -->
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal-box">
+      <span class="modal-icon">⚠️</span>
+      <div class="modal-title">Confirm Action</div>
+      <div class="modal-message"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+        <button class="btn btn-primary" id="modal-confirm-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-layout">
+    <nav class="app-navbar">
+      <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+      <div class="navbar-brand"><span class="brand-dot"></span>RationNet</div>
+      <div class="navbar-center">
+        <div class="navbar-shop-info">
+          <span class="navbar-shop-name" id="navbar-shop-name">—</span>
+          <span class="navbar-shop-id" id="navbar-shop-id">—</span>
+        </div>
+      </div>
+    </nav>
+
+    <div class="app-body">
+      <aside class="app-sidebar" id="app-sidebar">
+        <nav class="sidebar-nav">
+          <span class="sidebar-section-label">Navigation</span>
+          <a href="dashboard.html" class="sidebar-link"><span class="nav-icon">🏠</span><span class="nav-label">Dashboard</span></a>
+          <a href="stock.html" class="sidebar-link"><span class="nav-icon">📦</span><span class="nav-label">Stock</span></a>
+          <a href="beneficiaries.html" class="sidebar-link"><span class="nav-icon">👥</span><span class="nav-label">Beneficiaries</span></a>
+          <a href="distribution.html" class="sidebar-link active"><span class="nav-icon">🚚</span><span class="nav-label">Distribution</span></a>
+          <a href="reports.html" class="sidebar-link"><span class="nav-icon">📊</span><span class="nav-label">Reports</span></a>
+        </nav>
+        <div class="sidebar-footer">RationNet © 2025<br>Maharashtra PDS</div>
+      </aside>
+
+      <main class="main-content">
+        <div class="page-header">
+          <h1 class="page-title">Record Distribution</h1>
+        </div>
+
+        <!-- Distribution Form -->
+        <div class="form-section">
+          <div class="form-section-title">New Distribution Entry</div>
+          <form id="dist-form" novalidate>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="dist-card">Ration Card / Beneficiary ID <span class="required">*</span></label>
+                <div class="input-btn-group">
+                  <input type="text" id="dist-card" class="form-control" placeholder="MH-XXXXXX" style="text-transform:uppercase" maxlength="9">
+                  <button type="button" class="btn-lookup" id="btn-lookup">🔍 Lookup</button>
+                </div>
+                <span class="field-error" id="err-dist-card"></span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="dist-name">Beneficiary Name</label>
+                <input type="text" id="dist-name" class="form-control" readonly placeholder="Auto-filled after lookup">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="dist-category">Category</label>
+                <input type="text" id="dist-category" class="form-control" readonly placeholder="Auto-filled">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="dist-date">Distribution Date <span class="required">*</span></label>
+                <input type="date" id="dist-date" class="form-control">
+                <span class="field-error" id="err-dist-date"></span>
+              </div>
+            </div>
+
+            <!-- Beneficiary info chip -->
+            <div id="ben-info-chip" class="alert-banner green" style="display:none;margin:12px 0;gap:8px;font-size:0.82rem;font-family:var(--font-body)"></div>
+
+            <!-- Items Table -->
+            <div style="margin-top:16px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <span class="form-label" style="margin:0">Items to Distribute <span class="required">*</span></span>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-add-row">+ Add Item</button>
+              </div>
+              <div class="items-table-wrap">
+                <table class="items-table">
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th>Quantity</th>
+                      <th>Unit</th>
+                      <th style="width:50px"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="dist-items-body"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top:12px">
+              <label class="form-label" for="dist-remarks">Remarks (optional)</label>
+              <textarea id="dist-remarks" class="form-control" rows="2" placeholder="Any special notes…"></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">✅ Record Distribution</button>
+              <button type="reset" class="btn btn-secondary" onclick="document.getElementById('dist-items-body').innerHTML='';_itemRowCount=0;addItemRow();document.getElementById('ben-info-chip').style.display='none'">↺ Reset</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Today's Log -->
+        <div class="table-container">
+          <div class="table-toolbar">
+            <span class="table-toolbar-title">📋 Today's Distributions</span>
+            <span class="table-count" id="today-log-count"></span>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Card No.</th>
+                  <th>Beneficiary</th>
+                  <th>Items</th>
+                  <th>Total Qty</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="today-log-tbody">
+                <tr><td colspan="5" class="empty-state"><span class="empty-icon">📋</span>Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/storage.js?v=2"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/distribution.js"></script>
+</body>
+</html>
