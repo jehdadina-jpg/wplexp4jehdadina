@@ -205,3 +205,85 @@ const RN = {
 
 // Seed data on first load
 RN.seedIfEmpty();
+
+// ── Global UI Utilities (formerly in auth.js) ──
+window.initSidebar = function() {
+  const toggle = document.getElementById('sidebar-toggle');
+  const sidebar = document.getElementById('app-sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+
+  if (toggle && sidebar) {
+    toggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      if (overlay) overlay.classList.toggle('active');
+    });
+  }
+
+  if (overlay) {
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+    });
+  }
+};
+
+window.showToast = function(message, type = 'info', duration = 3000) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.textContent = message;
+
+  container.appendChild(toast);
+
+  // Trigger animation
+  setTimeout(() => toast.classList.add('show'), 10);
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+};
+
+window.showModal = function({ icon = '⚠️', title = 'Confirm Action', message = '', confirmText = 'Confirm', cancelText = 'Cancel', danger = false }) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('confirm-modal');
+    if (!overlay) {
+      resolve(confirm(message));
+      return;
+    }
+
+    const iconEl = overlay.querySelector('.modal-icon');
+    const titleEl = overlay.querySelector('.modal-title');
+    const msgEl = overlay.querySelector('.modal-message');
+    const confirmBtn = document.getElementById('modal-confirm-btn');
+    const cancelBtn = document.getElementById('modal-cancel-btn');
+
+    if (iconEl) iconEl.textContent = icon;
+    if (titleEl) titleEl.textContent = title;
+    if (msgEl) msgEl.innerHTML = message;
+
+    if (confirmBtn) {
+      confirmBtn.textContent = confirmText;
+      if (danger) {
+        confirmBtn.className = 'btn btn-danger';
+      } else {
+        confirmBtn.className = 'btn btn-primary';
+      }
+    }
+    if (cancelBtn) cancelBtn.textContent = cancelText;
+
+    const cleanup = (result) => {
+      overlay.classList.remove('active');
+      confirmBtn.onclick = null;
+      cancelBtn.onclick = null;
+      resolve(result);
+    };
+
+    confirmBtn.onclick = () => cleanup(true);
+    cancelBtn.onclick = () => cleanup(false);
+
+    overlay.classList.add('active');
+  });
+};

@@ -4,9 +4,11 @@
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
-  const session = requireAuth();
-  if (!session) return;
-  populateNavbar(session);
+  const navbarShopName = document.getElementById('navbar-shop-name');
+  if (navbarShopName) navbarShopName.textContent = 'Dadina Enterprises';
+  const navbarShopId = document.getElementById('navbar-shop-id');
+  if (navbarShopId) navbarShopId.textContent = 'SHOP01';
+  
   initSidebar();
 
   // Set default date range: last 30 days
